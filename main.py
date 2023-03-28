@@ -4,11 +4,15 @@ import pandas as pd
 
 def start_game():
     # Innitial communication with players
+    print('Tic Tac Toe game')
 
-    size = int(input('Tic-Tac Toe game. What board sie do you want to play? (3,4,5): '))
-    while not (size > 2 and size <= 5):
-        
-        size = int(input('Choose the correct size of the board (3,4,5): '))
+    while True:
+        try:
+            size = int(input('Choose the size of the board (3,4,5): '))
+            if size > 2 and size <= 5:
+                break
+        except ValueError:
+            print('Choose the correct size of the board (3,4,5): ')
 
     # Creating a board (between 3 and 5 rows/columns)
     val = [''] * size
@@ -20,34 +24,59 @@ def start_game():
     players = ['x', 'o']
     sign = 0
     while not check_winner(players[sign], board):
+        # player change
         sign = (sign + 1) % 2
         print(f"\n{players[sign]}'s turn")
-        try:
-            column = int(input(f'Which column do you choose?: '))
-        except ValueError:
-            column = int(input(f'Choose correct column: '))
+        while True:
+            try:
+                column = int(input(f'Choose column: '))
+                if column > 0 and column <= size:
+                    break
+                else:
+                    print(f'The column number should be between 1 and {size}')
+            except ValueError:
+                print(f'The column number should be between 1 and {size}')
 
-        row = int(input(f'Which row do you choose?: '))
+        while True:
+            try:
+                row = int(input(f'Choose row: '))
+                if row > 0 and row <= size:
+                    break
+                else:
+                    print(f'The row number should be between 1 and {size}')
+            except ValueError:
+                print(f'The row number should be between 1 and {size}')
         if board[column][row] not in players:
             board[column][row] = players[sign]
         else:
             print('This place is already taken')
         print(board)
-        # player change
-    game_on = input(f"Game over, {players[sign]} wins! Do you want to play again? (Y/N):")
+        for column_name, column_data in board.items():
+            if '-' in column_data.values:
+                print('jest miejsce')
+                no_winner = False
+                break
+            else:
+                no_winner = True
+            if no_winner == True:
+                print('No winner')
+                break
+
+    game_on = input("Do you want to play again? (Y/N):")
 
     return game_on
 
 def check_winner(player, board):
     is_winner = False
-    z = board.shape[0]-1
+    z = board.shape[0] - 1
+
     # check for columns:
     for column_name, column_data in board.items():
         if all(column_data.values == column_data.values[0]) and column_data.values[0] != '-':
             # print(f'Game over, the winner is {player}')
             is_winner = True
     # check for rows:
-    # checks if rist element is the same like the rest
+    # checks if first element is the same like the rest
     x = board.eq(board.iloc[:, 0], axis=0).all(1)
     # checks if there is a " - " sign in a row (non-win situation for rows)
     y = board.iloc[:, 0] != '-'
